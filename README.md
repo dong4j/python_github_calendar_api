@@ -88,6 +88,77 @@ StandardError=append:/path/to/python_github_calendar_api/server.log
 WantedBy=multi-user.target
 ```
 
+## 调用服务
+
+`GET http://ip:port/api?user={github username}`
+
+比如我本地部署在 `192.168.31.7:7779`，那么调用方式为 `http://192.168.31.7:7779/api?user=dong4j`
+
+![alt text](CleanShot_20241224cCLWeAHv.png)
+
+## 配合 Hexo 使用
+
+[前端 Hexo 插件](https://github.com/Barry-Flynn/hexo-github-calendar)
+
+### 即将本地服务发布到公网
+
+这个需要你有公网 IP, 如果没有就使用原版仓库部署到 Vercel 吧.
+
+假设我部署到公网并映射的域名为: `https://github-calendar.dong4j.top:8888`
+
+### 解决跨域问题
+
+我的上述服务和 Hexo 部署的公网域名不一样, 会存在跨域问题, 所以需要在本地的 Nginx 转发中配置允许跨域:
+
+```bash
+# 添加 CORS 相关的头部
+add_header 'Access-Control-Allow-Origin' '*' always;
+add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
+add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization' always;
+
+# 如果需要处理预检请求（preflight request）
+if ($request_method = 'OPTIONS') {
+   add_header 'Access-Control-Allow-Origin' '*';
+   add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+   add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization';
+   # 返回 204 状态码，表示不需要发送请求体
+   return 204;
+}
+```
+
+### 安装依赖
+
+```bash
+npm i @barry-flynn/hexo-github-calendar --save
+```
+
+### 添加配置
+
+在 Hexo 项目根目录的 `_config.yml` 文件最后面添加如下配置:
+
+```yaml
+# hexo-github-canlendar
+githubcalendar:
+  enable: true # 是否启用本插件
+  enable_page: / # 要生效的页面，如 / 首页，/about/ 介绍页等
+  user: shiguang-coding # GitHub 用户名
+  layout:
+    type: id
+    name: recent-posts
+    index: 0
+  githubcalendar_html: '<div class="recent-post-item" style="width:100%;height:auto;padding:10px;"><div id="github_loading" style="width:10%;height:100%;margin:0 auto;display: block"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  viewBox="0 0 50 50" style="enable-background:new 0 0 50 50" xml:space="preserve"><path fill="#d0d0d0" d="M25.251,6.461c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615V6.461z" transform="rotate(275.098 25 25)"><animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="0.6s" repeatCount="indefinite"></animateTransform></path></svg></div><div id="github_container"></div></div>'
+  pc_minheight: 280px
+  mobile_minheight: 0px
+  # 贡献统计的梯度色卡值，可自行调整
+  color: "['#ebedf0', '#a2f7af', '#6ce480', '#54ad63', '#469252', '#31753c', '#1f5f2a', '#13531f', '#084111', '#032b09', '#000000']"
+  # 推荐填写你自建的API接口
+  api: https://github-calendar.dong4j.top:8888/api
+  # 推荐下载后使用本地文件
+  # calendar_js: https://cdn.jsdelivr.net/gh/barry-flynn/hexo-github-calendar/hexo_githubcalendar.js # 在线文件，容易加载失败
+  calendar_js: /js/hexo_githubcalendar.js # 本地文件，请下载到主题文件夹的source目录下
+  plus_style: ""
+```
+
 # What's this?
 
 此项目改造自 [python_github_calendar_api](https://github.com/Zfour/python_github_calendar_api) 仓库，原理通过 Python 获取 GitHub 的用户贡献信息，你可以部署到 Vercel 上作为 API 使用。调用方式为标准的 key-value 格式：`/api?user=Barry-Flynn`，推荐结合本文档自行部署，如果帮到你了，请给个免费的 star 鼓励支持一下我吧！
