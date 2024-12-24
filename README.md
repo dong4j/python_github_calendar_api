@@ -36,6 +36,9 @@ python api/app.py
 
 ## 使用 --port 修改端口
 python api/app.py --port 8888
+
+## 使用 --cache 修改缓存时间(默认为 3 天)
+python api/app.py --port 8888 --cache 5
 ```
 
 ## 添加自启动
