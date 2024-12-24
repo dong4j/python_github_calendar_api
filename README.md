@@ -1,9 +1,95 @@
+# Local Deployment Version
+
+在 [python_github_calendar_api](https://github.com/Zfour/python_github_calendar_api) 的基础上，增加了本地部署版本，方便大家使用。
+
+## 新增功能
+
+1. 转换为 Web 服务, 提供 `/api` 接口;
+2. 增加缓存, 默认为 3 天;
+3. 更新依赖;
+
+## 使用方法
+
+1. 创建虚拟环境
+
+```bash
+python -m venv venv
+```
+
+2. 激活虚拟环境
+
+```bash
+source venv/bin/activate
+```
+
+3. 安装依赖
+
+```bash
+pip install -r requirements.txt
+```
+
+4. 启动服务
+
+```bash
+# 默认端口为 8080
+python api/app.py
+
+## 使用 --port 修改端口
+python api/app.py --port 8888
+```
+
+## 添加自启动
+
+```bash
+sudo vim /etc/systemd/system/github_calendar.service
+```
+
+```bash
+[Service]
+User={your_username}
+WorkingDirectory=/path/to/python_github_calendar_api
+ExecStart=/path/to/python_github_calendar_api/venv/bin/python3 /path/to/python_github_calendar_api/api/app.py
+Restart=always
+StandardOutput=append:/path/to/python_github_calendar_api/server.log
+StandardError=append:/path/to/python_github_calendar_api/server.log
+
+[Install]
+WantedBy=multi-user.target
+```
+
+## 启动服务
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl start github_calendar
+sudo systemctl enable github_calendar
+```
+
+## 添加代理
+
+因为众所周知的原因, GitHub 可能访问较慢会导致 api 超时, 所以可以在自启动中添加代理
+
+```bash
+[Service]
+User={your_username}
+WorkingDirectory=/path/to/python_github_calendar_api
+Environment="https_proxy=http://ip:port"
+Environment="https_proxy=http://ip:port"
+Environment="no_proxy=localhost,127.0.0.1"
+ExecStart=/path/to/python_github_calendar_api/venv/bin/python3 /path/to/python_github_calendar_api/api/app.py
+Restart=always
+StandardOutput=append:/path/to/python_github_calendar_api/server.log
+StandardError=append:/path/to/python_github_calendar_api/server.log
+
+[Install]
+WantedBy=multi-user.target
+```
+
 # What's this?
 
 此项目改造自 [python_github_calendar_api](https://github.com/Zfour/python_github_calendar_api) 仓库，原理通过 Python 获取 GitHub 的用户贡献信息，你可以部署到 Vercel 上作为 API 使用。调用方式为标准的 key-value 格式：`/api?user=Barry-Flynn`，推荐结合本文档自行部署，如果帮到你了，请给个免费的 star 鼓励支持一下我吧！
 
 如果你有 Hexo 博客，可以搭配使用 [Barry-Flynn/hexo-github-calendar](https://github.com/Barry-Flynn/hexo-github-calendar) 插件在前端渲染贡献热力图。
-
 
 ## 如何部署自用的 Vercel API
 
@@ -32,15 +118,13 @@
 2. 若是执着于当前`Github`账号，可以参考以下方案进行尝试:
 
    - 完成了 `Gmail` 等国外邮箱的注册，打开 [github-> 头像 ->settings->Emails](https://github.com/settings/emails)->Add email address, 并完成邮箱验证。
-   - 在Add email address 下方的Primary email address 选项中将 `Gmail` 设置为主邮箱。
+   - 在 Add email address 下方的 Primary email address 选项中将 `Gmail` 设置为主邮箱。
 
-### 2. 新建项目，fork我的项目
+### 2. 新建项目，fork 我的项目
 
 打开 [dashboard](https://vercel.com/dashboard) 点击新建项目的 `New Project` 按钮。点击导入第三方库。
 
 ![image.png](https://cdn.nlark.com/yuque/0/2021/png/8391485/1612949541795-cfe67df4-a443-4604-86fd-a34ea9c34bed.png)
-
-
 
 填入俺提供的自建 API 项目地址:
 
@@ -48,17 +132,13 @@
 https://github.com/Barry-Flynn/python_github_calendar_api
 ```
 
-
-
 ![image.png](https://cdn.nlark.com/yuque/0/2021/png/8391485/1612949577842-18cc23f8-5cf6-4f72-b892-d244d22a3089.png)
 
 选择私有账户。点击`select`。
 
-
-
 ![image.png](https://cdn.nlark.com/yuque/0/2021/png/8391485/1612949622863-54b72f81-9add-479d-94ed-aeb125099afe.png)
 
-选择github按钮然后会帮你将仓库克隆到你的github中，填入自定义仓库名称，如 `python_github_calendar_api`。
+选择 github 按钮然后会帮你将仓库克隆到你的 github 中，填入自定义仓库名称，如 `python_github_calendar_api`。
 
 ![image.png](https://cdn.nlark.com/yuque/0/2021/png/8391485/1612949755226-a97f3c75-8328-4630-91f2-2dd9dddf3665.png)
 
@@ -66,19 +146,16 @@ https://github.com/Barry-Flynn/python_github_calendar_api
 
 ![image.png](https://cdn.nlark.com/yuque/0/2021/png/8391485/1612949831064-f4b2cef1-eb64-4bac-8841-b991768ffee8.png)
 
-`Vercel` 的 `PROJECT NAME` 可以自定义，不用太过在意，但是之后不支持修改，若要改名，只能删除 `PROJECT` 以后重建一个了。下方三个选项保持默认就好。 
-
+`Vercel` 的 `PROJECT NAME` 可以自定义，不用太过在意，但是之后不支持修改，若要改名，只能删除 `PROJECT` 以后重建一个了。下方三个选项保持默认就好。
 
 ![image.png](https://cdn.nlark.com/yuque/0/2021/png/8391485/1612949883724-064103a2-658f-49cb-b1e6-f3a7f0a511d1.png)
 
+此时点击 Deploy，`Vercel` 的 api 部署已经完成。
 
+### 3. 检查 API 是否配置成功
 
-此时点击Deploy，`Vercel` 的api部署已经完成。
-
-### 3. 检查API是否配置成功
-
-访问**API链接**（图中链接+'/api'+查询参数）,如我的为
+访问**API 链接**（图中链接+'/api'+查询参数）,如我的为
 
 https://python-github-calendar-api.vercel.app/api/?user=Barry-Flynn
 
-如果显示数据则说明API配置成功。
+如果显示数据则说明 API 配置成功。
