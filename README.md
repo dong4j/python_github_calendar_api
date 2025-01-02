@@ -88,6 +88,14 @@ StandardError=append:/path/to/python_github_calendar_api/server.log
 WantedBy=multi-user.target
 ```
 
+## 我的使用方式
+
+为了实时性, 会缓存一天的数据, 所以使用使用 `python api/app.py --port 8888 --cache 1` 启动服务, 并在服务器上使用定时任务定时刷新数据:
+
+```bash
+0 1 * * * /usr/bin/curl http://127.0.0.1:8888/api?user=dong4j
+```
+
 ## 调用服务
 
 `GET http://ip:port/api?user={github username}`
@@ -158,6 +166,8 @@ githubcalendar:
   calendar_js: /js/hexo_githubcalendar.js # 本地文件，请下载到主题文件夹的source目录下
   plus_style: ""
 ```
+
+---
 
 # What's this?
 
